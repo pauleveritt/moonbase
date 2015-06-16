@@ -1,0 +1,28 @@
+{% extends "templates/base.jinja2" %}
+{% block title %}ToDos List{% endblock %}
+{% block content %}
+<a class="btn btn-primary pull-right"
+    href="{{ request.route_url('add') }}">Add</a>
+<h1>List</h1>
+<table class="table table-striped">
+
+{% for todo in todos %}
+  <tr>
+      <td>
+        <a href="{{ request.route_url('view', id=todo.id) }}">
+        {{ todo.title }}
+        </a>
+       </td>
+       <td>
+        <a href="{{ request.route_url('edit', id=todo.id) }}">
+          edit
+        </a>
+        <a href="{{ request.route_url('delete', id=todo.id) }}">
+          delete
+        </a>
+       </td>
+  </tr>
+{% endfor %}
+
+</table>
+{% endblock %}
