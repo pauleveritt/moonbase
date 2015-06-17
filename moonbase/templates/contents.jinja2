@@ -2,7 +2,7 @@
 
 <div class="row">
     <ul class="list-group col-md-6">
-      {% for child in context.values() %}
+      {% for child in allowed_values %}
           <li class="list-group-item">
 
               <a href="{{ request.resource_url(child) }}">

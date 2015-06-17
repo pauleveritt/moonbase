@@ -28,6 +28,7 @@ class Node(BaseObject):
                             backref=backref('parent', remote_side=[id])
     )
     type = Column(String(50))
+    __acl__ = Column(String(50))
 
     @classproperty
     def __mapper_args__(cls):
@@ -62,3 +63,14 @@ class Node(BaseObject):
     @property
     def __parent__(self):
         return self.parent
+
+    # TODO This would be better as something not in Python, but
+    # instead, something that could run in the query, perhaps
+    # effectively using the optimizer, perhaps done well in
+    # SQLAlchemy. It would be nice to optimized even further by bailing
+    # out as soon as a node (context or a parent) had a Deny that
+    # failed. Finally, perhaps we have to, like Substance D, maintain
+    # some other datastructure.
+
+    def allowed_values(self, principals, permission):
+        return self.values()

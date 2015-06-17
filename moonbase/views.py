@@ -21,7 +21,11 @@ class RootViews:
     @view_config(renderer='templates/root.jinja2', context=Folder,
                  custom_predicates=[lambda c, r: c is r.root])
     def view(self):
-        return dict()
+        principals = ['paul', 'shane']
+        permissions = ['read']
+        av = self.context.allowed_values(principals, permissions)
+        print ('view', self.context.__acl__)
+        return dict(allowed_values=av)
 
     @view_config(name='delete')
     def delete(self):
@@ -38,15 +42,13 @@ class FolderViews:
         # TODO This should change to a CTE in model
         self.parents = reversed(list(lineage(context)))
 
-    @view_config(renderer='templates/root.jinja2', context=Folder,
-                 custom_predicates=[lambda c, r: c is r.root])
-    def root(self):
-        return dict()
-
     @view_config(renderer="templates/folder.jinja2",
                  context=Folder)
     def view(self):
-        return dict()
+        principals = ['paul', 'shane']
+        permissions = ['read']
+        av = self.context.allowed_values(principals, permissions)
+        return dict(allowed_values=av)
 
     @view_config(name="add_folder", context=Folder)
     def add(self):
