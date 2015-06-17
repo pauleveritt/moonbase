@@ -34,7 +34,7 @@ def main(argv=sys.argv):
     # Make the database with schema and default data
     with transaction.manager:
         metadata.create_all()
-        root = Folder(name='', title='My SQLTraversal Root')
+        root = Folder(name='', title='Moonbase Demo')
         Session.add(root)
         f1 = root['f1'] = Folder(title='Folder 1')
         f1['da'] = Document(title='Document 1A')

@@ -2,37 +2,54 @@ from random import randint
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.location import lineage
-from pyramid.view import view_config, notfound_view_config
-
+from pyramid.view import view_config
 
 from pyramid_sqlalchemy import Session
-
 
 from .models.folder import Folder
 from .models.document import Document
 
-class MySite:
+
+class RootViews:
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
-        # TODO This should change to a CTE
+        # TODO This should change to a CTE in model
+        self.parents = reversed(list(lineage(context)))
+
+    @view_config(renderer='templates/root.jinja2', context=Folder,
+                 custom_predicates=[lambda c, r: c is r.root])
+    def view(self):
+        return dict()
+
+    @view_config(name='delete')
+    def delete(self):
+        Session.delete(self.context)
+        url = self.request.resource_url(self.context.__parent__)
+        return HTTPFound(url)
+
+
+class FolderViews:
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+        # TODO This should change to a CTE in model
         self.parents = reversed(list(lineage(context)))
 
     @view_config(renderer='templates/root.jinja2', context=Folder,
                  custom_predicates=[lambda c, r: c is r.root])
     def root(self):
-        page_title = 'Quick Tutorial: Root'
-        return dict(page_title=page_title)
+        return dict()
 
     @view_config(renderer="templates/folder.jinja2",
                  context=Folder)
-    def folder(self):
-        page_title = 'Quick Tutorial: Folder'
-        return dict(page_title=page_title)
+    def view(self):
+        return dict()
 
     @view_config(name="add_folder", context=Folder)
-    def add_folder(self):
+    def add(self):
         # Make a new Folder
         title = self.request.POST['folder_title']
         name = str(randint(0, 999999))
@@ -42,8 +59,17 @@ class MySite:
         url = self.request.resource_url(new_folder)
         return HTTPFound(location=url)
 
+
+class DocumentViews:
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+        # TODO This should change to a CTE in model
+        self.parents = reversed(list(lineage(context)))
+
     @view_config(name="add_document", context=Folder)
-    def add_document(self):
+    def add(self):
         # Make a new Document
         title = self.request.POST['document_title']
         name = str(randint(0, 999999))
@@ -55,16 +81,5 @@ class MySite:
 
     @view_config(renderer="templates/document.jinja2",
                  context=Document)
-    def document(self):
-        page_title = 'Quick Tutorial: Document'
-        return dict(page_title=page_title)
-
-    @view_config(name='delete')
-    def delete(self):
-        Session.delete(self.context)
-        url = self.request.resource_url(self.context.__parent__)
-        return HTTPFound(url)
-
-    @notfound_view_config(renderer='templates/notfound.jinja2')
-    def not_found(self):
+    def view(self):
         return dict()
