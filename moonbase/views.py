@@ -24,7 +24,7 @@ class MySite:
     @property
     def current(self):
         todo_id = self.request.matchdict.get('id')
-        return Session.query(ToDo).filter(ToDo. id == todo_id).one()
+        return Session.query(ToDo).filter(ToDo.id == todo_id).one()
 
     @view_config(route_name='home', renderer='templates/home.jinja2')
     def home(self):
@@ -67,7 +67,7 @@ class MySite:
     @view_config(route_name='todos_edit',
                  renderer='templates/edit.jinja2')
     def edit(self):
-        edit_form = self.form.render(self.current)
+        edit_form = self.form.render(self.current.__dict__)
         return dict(todo=self.current, edit_form=edit_form)
 
     @view_config(route_name='todos_edit',
@@ -82,12 +82,13 @@ class MySite:
             return dict(edit_form=e.render())
 
         # Valid form so save the title and redirect with message
-        self.current['title'] = appstruct['title']
-        url = self.request.route_url('todos_view', id=self.current['id'])
+        self.current.title = appstruct['title']
+        url = self.request.route_url('todos_view', id=self.current.id)
         return HTTPFound(url)
 
     @view_config(route_name='todos_delete')
     def delete(self):
+        Session.delete(self.current)
         url = self.request.route_url('todos_list')
         return HTTPFound(url)
 
