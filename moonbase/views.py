@@ -1,8 +1,11 @@
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from random import randint
+
+from pyramid.httpexceptions import HTTPFound
+from pyramid.location import lineage
 from pyramid.view import view_config, notfound_view_config
 
 import colander
-from deform import Form, ValidationFailure
+from deform import Form
 
 from pyramid_sqlalchemy import Session
 
@@ -10,85 +13,63 @@ from pyramid_sqlalchemy import Session
 class ToDoSchema(colander.MappingSchema):
     title = colander.SchemaNode(colander.String())
 
-
-from .models.todo import ToDo
-
+from .models.folder import Folder
+from .models.document import Document
 
 class MySite:
-    def __init__(self, request):
+    def __init__(self, context, request):
+        self.context = context
         self.request = request
         self.schema = ToDoSchema()
         self.form = Form(self.schema, buttons=('submit',))
 
-    @property
-    def current(self):
-        todo_id = self.request.matchdict.get('id')
-        return Session.query(ToDo).filter(ToDo.id == todo_id).one()
+        # TODO This should change to a CTE
+        self.parents = reversed(list(lineage(context)))
 
-    @view_config(route_name='home', renderer='templates/home.jinja2')
-    def home(self):
-        return dict()
+    @view_config(renderer='templates/root.jinja2', context=Folder,
+                 custom_predicates=[lambda c, r: c is r.root])
+    def root(self):
+        page_title = 'Quick Tutorial: Root'
+        return dict(page_title=page_title)
 
-    @view_config(route_name='todos_list',
-                 renderer='templates/list.jinja2')
-    def list(self):
-        todos = Session.query(ToDo).order_by(ToDo.title)
-        return dict(todos=todos)
+    @view_config(renderer="templates/folder.jinja2",
+                 context=Folder)
+    def folder(self):
+        page_title = 'Quick Tutorial: Folder'
+        return dict(page_title=page_title)
 
-    @view_config(route_name='todos_add',
-                 renderer='templates/add.jinja2')
-    def add(self):
-        return dict(add_form=self.form.render())
+    @view_config(name="add_folder", context=Folder)
+    def add_folder(self):
+        # Make a new Folder
+        title = self.request.POST['folder_title']
+        name = str(randint(0, 999999))
+        new_folder = self.context[name] = Folder(title=title)
 
-    @view_config(route_name='todos_add',
-                 renderer='templates/add.jinja2',
-                 request_method='POST')
-    def add_handler(self):
-        controls = self.request.POST.items()
-        try:
-            appstruct = self.form.validate(controls)
-        except ValidationFailure as e:
-            # Form is NOT valid
-            return dict(add_form=e.render())
+        # Redirect to the new folder
+        url = self.request.resource_url(new_folder)
+        return HTTPFound(location=url)
 
-        # Add a new to do to the database then redirect
-        title = appstruct['title']
-        Session.add(ToDo(title=title))
-        todo = Session.query(ToDo).filter_by(title=title).one()
-        url = self.request.route_url('todos_list', id=todo.id)
-        return HTTPFound(url)
+    @view_config(name="add_document", context=Folder)
+    def add_document(self):
+        # Make a new Document
+        title = self.request.POST['document_title']
+        name = str(randint(0, 999999))
+        new_document = self.context[name] = Document(title=title)
 
-    @view_config(route_name='todos_view',
-                 renderer='templates/view.jinja2')
-    def view(self):
-        return dict(todo=self.current)
+        # Redirect to the new document
+        url = self.request.resource_url(new_document)
+        return HTTPFound(location=url)
 
-    @view_config(route_name='todos_edit',
-                 renderer='templates/edit.jinja2')
-    def edit(self):
-        edit_form = self.form.render(self.current.__dict__)
-        return dict(todo=self.current, edit_form=edit_form)
+    @view_config(renderer="templates/document.jinja2",
+                 context=Document)
+    def document(self):
+        page_title = 'Quick Tutorial: Document'
+        return dict(page_title=page_title)
 
-    @view_config(route_name='todos_edit',
-                 renderer='templates/edit.jinja2',
-                 request_method='POST')
-    def edit_handler(self):
-        controls = self.request.POST.items()
-        try:
-            appstruct = self.form.validate(controls)
-        except ValidationFailure as e:
-            # Form is NOT valid
-            return dict(edit_form=e.render())
-
-        # Valid form so save the title and redirect with message
-        self.current.title = appstruct['title']
-        url = self.request.route_url('todos_view', id=self.current.id)
-        return HTTPFound(url)
-
-    @view_config(route_name='todos_delete')
+    @view_config(name='delete')
     def delete(self):
-        Session.delete(self.current)
-        url = self.request.route_url('todos_list')
+        Session.delete(self.context)
+        url = self.request.resource_url(self.context.__parent__)
         return HTTPFound(url)
 
     @notfound_view_config(renderer='templates/notfound.jinja2')
