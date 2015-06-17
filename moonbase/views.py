@@ -20,7 +20,6 @@ class MySite:
         self.request = request
         self.schema = ToDoSchema()
         self.form = Form(self.schema, buttons=('submit',))
-        self.msg = request.params.get('msg')
 
     @property
     def current(self):
@@ -54,15 +53,10 @@ class MySite:
             return dict(add_form=e.render())
 
         # Add a new to do to the database then redirect
-        todo = ToDo(id=todo['id'], title=todo['title'])
-        Session.add(todo)
         title = appstruct['title']
         Session.add(ToDo(title=title))
         todo = Session.query(ToDo).filter_by(title=title).one()
-        msg = 'new_title: ' + title
-        url = self.request.route_url('todos_list',
-                                     id=todo.id,
-                                     _query=dict(msg=msg))
+        url = self.request.route_url('todos_list', id=todo.id)
         return HTTPFound(url)
 
     @view_config(route_name='todos_view',
@@ -89,16 +83,12 @@ class MySite:
 
         # Valid form so save the title and redirect with message
         self.current['title'] = appstruct['title']
-        msg = 'new_title: ' + appstruct['title']
-        url = self.request.route_url('todos_view',
-                                     id=self.current['id'],
-                                     _query=dict(msg=msg))
+        url = self.request.route_url('todos_view', id=self.current['id'])
         return HTTPFound(url)
 
     @view_config(route_name='todos_delete')
     def delete(self):
-        msg = 'Deleted: ' + self.current['id']
-        url = self.request.route_url('todos_list', _query=dict(msg=msg))
+        url = self.request.route_url('todos_list')
         return HTTPFound(url)
 
     @notfound_view_config(renderer='templates/notfound.jinja2')

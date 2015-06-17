@@ -28,13 +28,6 @@
 </nav>
 
 <div id="content" class="container">
-
-  {% if view.msg %}
-      <div class="alert alert-info">
-        {{ view.msg }}
-      </div>
-  {% endif %}
-
   {% block content %}{% endblock %}
 </div>
 
