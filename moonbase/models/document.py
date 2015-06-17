@@ -5,7 +5,7 @@ from sqlalchemy import (
     ForeignKey,
 )
 
-from .sqltraversal import Node
+from .node import Node
 
 
 class Document(Node):

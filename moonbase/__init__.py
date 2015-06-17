@@ -1,6 +1,6 @@
 from pyramid.config import Configurator
 
-from .models.sqltraversal import root_factory
+from .models.node import root_factory
 
 
 def main(global_config, **settings):

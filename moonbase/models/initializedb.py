@@ -10,7 +10,7 @@ from pyramid.paster import (
     setup_logging,
 )
 
-from .folder import Folder
+from .folder import RootFolder, Folder
 from .document import Document
 
 
@@ -34,12 +34,17 @@ def main(argv=sys.argv):
     # Make the database with schema and default data
     with transaction.manager:
         metadata.create_all()
-        root = Folder(name='',
+        root = RootFolder(name='',
                       title='Moonbase Demo',
-                      __acl__='Hello'
+                      __acl__=[
+                          ['Allow', ['paul'], 'view']
+                      ]
                       )
         Session.add(root)
         f1 = root['f1'] = Folder(
-            title='Folder 1'
+            title='Folder 1',
+            __acl__=[
+                ['Allow', ['shane'], 'view']
+            ]
         )
         f1['da'] = Document(title='Document 1A')

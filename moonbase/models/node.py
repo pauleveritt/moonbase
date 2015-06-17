@@ -11,9 +11,9 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.util import classproperty
+from sqlalchemy.dialects.postgresql import JSONB
 
 from pyramid_sqlalchemy import BaseObject, Session
-
 
 def root_factory(request):
     return Session.query(Node).filter_by(parent_id=None).one()
@@ -28,7 +28,7 @@ class Node(BaseObject):
                             backref=backref('parent', remote_side=[id])
     )
     type = Column(String(50))
-    __acl__ = Column(String(50))
+    __acl__ = Column(JSONB)
 
     @classproperty
     def __mapper_args__(cls):
@@ -72,5 +72,17 @@ class Node(BaseObject):
     # failed. Finally, perhaps we have to, like Substance D, maintain
     # some other datastructure.
 
+
+    # This is fast in Substance D because most things are not in the
+    # ObjectMap's path_to_acl, as they have the default acl of none.
     def allowed_values(self, principals, permission):
-        return self.values()
+        results = []
+        for child in self.values():
+
+            # Starting with the child, walk up the parentage, looking
+            # at ACLs and bailing out when there is a violation. Look
+            # here for illustration:
+            # https://github.com/Pylons/substanced/blob/master/substanced/objectmap/__init__.py#L527
+            results.append(child) # do nothing for now
+
+        return results

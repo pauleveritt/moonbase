@@ -6,7 +6,7 @@ from pyramid.view import view_config
 
 from pyramid_sqlalchemy import Session
 
-from .models.folder import Folder
+from .models.folder import RootFolder, Folder
 from .models.document import Document
 
 
@@ -18,13 +18,11 @@ class RootViews:
         # TODO This should change to a CTE in model
         self.parents = reversed(list(lineage(context)))
 
-    @view_config(renderer='templates/root.jinja2', context=Folder,
-                 custom_predicates=[lambda c, r: c is r.root])
+    @view_config(renderer='templates/root.jinja2', context=RootFolder)
     def view(self):
         principals = ['paul', 'shane']
         permissions = ['read']
         av = self.context.allowed_values(principals, permissions)
-        print ('view', self.context.__acl__)
         return dict(allowed_values=av)
 
     @view_config(name='delete')
