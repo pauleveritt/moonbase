@@ -8,12 +8,12 @@ requires = [
     'pyramid_sqlalchemy',
     'waitress'
 ]
-setup(name='todo',
+setup(name='moonbase',
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
-      main = todo:main
+      main = moonbase:main
       [console_scripts]
-      initialize_moonbase_db = todo.scripts.initializedb:main
+      initialize_moonbase_db = moonbase.scripts.initializedb:main
       """
       )

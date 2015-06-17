@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+<head>
+    <title>{% block title %}{% endblock %} - MySite</title>
+    <link rel="stylesheet"
+          href="//oss.maxcdn.com/bootstrap/3.3.4/css/bootstrap.css">
+    <link rel="stylesheet"
+          href="{{ request.static_url('moonbase:static/mysite.css') }}">
+    <link rel="shortcut icon"
+          href="request.static_url('moonbase:static/pyramid-16x16.png')">
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="navbar-header">
+        <a class="navbar-brand"
+           href="{{ request.route_url('home') }}">MySite</a>
+    </div>
+    <ul class="nav navbar-nav">
+        <li>
+            <a href="{{ request.route_url('todos_list') }}">
+                ToDos
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<div id="content" class="container">
+
+  {% if view.msg %}
+      <div class="alert alert-info">
+        {{ view.msg }}
+      </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="//oss.maxcdn.com/jquery/2.1.3/jquery.js"></script>
+</body>
+</html>

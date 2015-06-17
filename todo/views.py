@@ -4,10 +4,12 @@ from pyramid.view import view_config
 import deform
 from pyramid_sqlalchemy import Session
 
-from .models import (
-    ToDoItem,
-    ToDoItemSchema
-)
+
+
+import colander
+
+class ToDoItemSchema(colander.MappingSchema):
+    title = colander.SchemaNode(colander.String())
 
 
 class MyApp:

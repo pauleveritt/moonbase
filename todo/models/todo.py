@@ -1,15 +1,9 @@
-import colander
-from sqlalchemy import (
-    Column,
+from sqlalchemy.schema import Column
+from sqlalchemy.types import (
     Integer,
-    Text
+    Text,
 )
 from pyramid_sqlalchemy import BaseObject
-
-
-class ToDoItemSchema(colander.MappingSchema):
-    title = colander.SchemaNode(colander.String())
-
 
 class ToDoItem(BaseObject):
     __tablename__ = 'todoitem'
