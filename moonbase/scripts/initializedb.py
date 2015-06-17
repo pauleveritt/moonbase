@@ -55,5 +55,5 @@ def main(argv=sys.argv):
             Session.add(u)
 
         for todo in TODOS:
-            td = ToDo(id=todo['id'], title=todo['title'])
+            td = ToDo(title=todo['title'])
             Session.add(td)

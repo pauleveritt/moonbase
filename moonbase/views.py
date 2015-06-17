@@ -54,11 +54,15 @@ class MySite:
             return dict(add_form=e.render())
 
         # Add a new to do to the database then redirect
+        todo = ToDo(id=todo['id'], title=todo['title'])
+        Session.add(todo)
         title = appstruct['title']
-        Session.add(ToDoItem(title=title))
-        todo = Session.query(ToDoItem).filter_by(title=title).one()
+        Session.add(ToDo(title=title))
+        todo = Session.query(ToDo).filter_by(title=title).one()
         msg = 'new_title: ' + title
-        url = self.request.route_url('todos_list', _query=dict(msg=msg))
+        url = self.request.route_url('todos_list',
+                                     id=todo.id,
+                                     _query=dict(msg=msg))
         return HTTPFound(url)
 
     @view_config(route_name='todos_view',

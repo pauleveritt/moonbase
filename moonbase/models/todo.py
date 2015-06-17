@@ -12,20 +12,8 @@ class ToDo(BaseObject):
     title = Column(Text, unique=True)
 
 TODOS = [
-    dict(
-        id=1,
-        title='First ToDo'
-    ),
-    dict(
-        id=2,
-        title='Change the air filters'
-    ),
-    dict(
-        id=3,
-        title='Overdue Reminder'
-    ),
-    dict(
-        id=4,
-        title='Get the milk'
-    )
+    dict(title='First ToDo'),
+    dict(title='Change the air filters'),
+    dict(title='Overdue Reminder'),
+    dict(title='Get the milk')
 ]
