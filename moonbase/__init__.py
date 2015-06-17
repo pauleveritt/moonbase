@@ -1,8 +1,6 @@
 from pyramid.config import Configurator
-from pyramid.authorization import ACLAuthorizationPolicy
 
 from .models.sqltraversal import root_factory
-# from .security import groupfinder
 
 
 def main(global_config, **settings):

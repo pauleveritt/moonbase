@@ -6,6 +6,7 @@ requires = [
     'deform>=2.0a2',
     'pyramid_tm',
     'pyramid_sqlalchemy',
+    'psycopg2',
     'waitress'
 ]
 setup(name='moonbase',
@@ -14,6 +15,6 @@ setup(name='moonbase',
       [paste.app_factory]
       main = moonbase:main
       [console_scripts]
-      initialize_moonbase_db = moonbase.scripts.initializedb:main
+      initialize_moonbase_db = moonbase.models.initializedb:main
       """
       )

@@ -10,11 +10,9 @@ from pyramid.paster import (
     setup_logging,
 )
 
-from ..models.site import (
-    Document,
-    Folder,
-)
-from ..models.users import User, USERS
+from .folder import Folder
+from .document import Document
+from .todo import ToDo, TODOS
 
 
 def usage(argv):
@@ -42,13 +40,6 @@ def main(argv=sys.argv):
         f1 = root['f1'] = Folder(title='Folder 1')
         f1['da'] = Document(title='Document 1A')
 
-        for user in USERS:
-            u = User(id=user['id'],
-                     username=user['username'],
-                     email=user['email'],
-                     first_name=user['first_name'],
-                     last_name=user['last_name'],
-                     twitter=user['twitter'],
-                     password=user['password'],
-                     groups=user['groups'])
-            Session.add(u)
+        for todo in TODOS:
+            td = ToDo(title=todo['title'])
+            Session.add(td)

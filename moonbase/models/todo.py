@@ -5,7 +5,6 @@ from sqlalchemy import (
 )
 from pyramid_sqlalchemy import BaseObject
 
-
 class ToDo(BaseObject):
     __tablename__ = 'todo'
     id = Column(Integer, primary_key=True)

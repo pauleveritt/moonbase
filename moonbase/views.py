@@ -12,7 +12,6 @@ class ToDoSchema(colander.MappingSchema):
 
 
 from .models.todo import ToDo
-from .models.site import Folder
 
 
 class MySite:
