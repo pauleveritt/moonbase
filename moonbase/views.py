@@ -4,14 +4,9 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.location import lineage
 from pyramid.view import view_config, notfound_view_config
 
-import colander
-from deform import Form
 
 from pyramid_sqlalchemy import Session
 
-
-class ToDoSchema(colander.MappingSchema):
-    title = colander.SchemaNode(colander.String())
 
 from .models.folder import Folder
 from .models.document import Document
@@ -20,8 +15,6 @@ class MySite:
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.schema = ToDoSchema()
-        self.form = Form(self.schema, buttons=('submit',))
 
         # TODO This should change to a CTE
         self.parents = reversed(list(lineage(context)))

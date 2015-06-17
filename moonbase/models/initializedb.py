@@ -12,7 +12,6 @@ from pyramid.paster import (
 
 from .folder import Folder
 from .document import Document
-from .todo import ToDo, TODOS
 
 
 def usage(argv):
@@ -39,7 +38,3 @@ def main(argv=sys.argv):
         Session.add(root)
         f1 = root['f1'] = Folder(title='Folder 1')
         f1['da'] = Document(title='Document 1A')
-
-        for todo in TODOS:
-            td = ToDo(title=todo['title'])
-            Session.add(td)
